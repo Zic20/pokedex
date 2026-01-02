@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"errors"
@@ -6,33 +6,33 @@ import (
 	"os"
 )
 
-type cliCommand struct {
-	name        string
-	description string
-	callback    func(conf *config) error
+type CliCommand struct {
+	Name        string
+	Description string
+	Callback    func(conf *Config) error
 }
 
-type config struct {
+type Config struct {
 	Next     string
 	Previous string
 }
 
-func commandExit(conf *config) error {
+func CommandExit(conf *Config) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil // never reached. added to match the callback signature for commands
 }
 
-func commandHelp(conf *config) error {
+func CommandHelp(conf *Config) error {
 	fmt.Print("Welcome to the Pokedex!\nUsage:\n\nhelp: Displays a help message\nexit: Exit the Pokedex\n")
 	return nil
 }
 
-func commandMap(conf *config) error {
+func CommandMap(conf *Config) error {
 	if conf.Next == "" {
 		return errors.New("you're on the last page")
 	}
-	location_area, err := fetchPokemonMap(conf.Next, conf)
+	location_area, err := FetchPokemonMap(conf.Next, conf)
 	if err != nil {
 		return err
 	}
@@ -42,11 +42,11 @@ func commandMap(conf *config) error {
 	return nil
 }
 
-func commandMapB(conf *config) error {
+func CommandMapB(conf *Config) error {
 	if conf.Previous == "" {
 		return errors.New("you're on the first page")
 	}
-	location_area, err := fetchPokemonMap(conf.Previous, conf)
+	location_area, err := FetchPokemonMap(conf.Previous, conf)
 	if err != nil {
 		return err
 	}

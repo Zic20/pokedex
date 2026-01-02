@@ -1,11 +1,10 @@
-package main
+package internal
 
 import (
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
-	"strings"
 )
 
 type apiResponse struct {
@@ -20,15 +19,7 @@ type locationsResult struct {
 	Url  string `json:"url"`
 }
 
-func cleanInput(text string) []string {
-	if len(text) == 0 {
-		return []string{}
-	}
-	str := strings.Trim(strings.ToLower(text), " ")
-	return strings.Split(str, " ")
-}
-
-func fetchPokemonMap(url string, conf *config) (apiResponse, error) {
+func FetchPokemonMap(url string, conf *Config) (apiResponse, error) {
 	var result apiResponse
 	res, err := http.Get(url)
 	if err != nil {

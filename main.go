@@ -4,33 +4,35 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+
+	"github.com/zic20/pokedex/internal"
 )
 
 func main() {
-	supportedCommands := map[string]cliCommand{
+	supportedCommands := map[string]internal.CliCommand{
 		"exit": {
-			name:        "exit",
-			description: "Exit the Pokedex",
-			callback:    commandExit,
+			Name:        "exit",
+			Description: "Exit the Pokedex",
+			Callback:    internal.CommandExit,
 		},
 		"help": {
-			name:        "help",
-			description: "Displays a help message",
-			callback:    commandHelp,
+			Name:        "help",
+			Description: "Displays a help message",
+			Callback:    internal.CommandHelp,
 		},
 		"map": {
-			name:        "map",
-			description: "Displays the names of 20 location areas in the Pokemon world",
-			callback:    commandMap,
+			Name:        "map",
+			Description: "Displays the names of 20 location areas in the Pokemon world",
+			Callback:    internal.CommandMap,
 		},
 		"mapb": {
-			name:        "mapb",
-			description: "Display the names of the previous 20 location areas in the Pokemon world",
-			callback:    commandMapB,
+			Name:        "mapb",
+			Description: "Display the names of the previous 20 location areas in the Pokemon world",
+			Callback:    internal.CommandMapB,
 		},
 	}
 
-	sysConfig := config{
+	sysConfig := internal.Config{
 		Next:     "https://pokeapi.co/api/v2/location-area",
 		Previous: "",
 	}
@@ -44,12 +46,11 @@ func main() {
 			if !ok {
 				fmt.Println("Unknown command")
 			} else {
-				err := cmd.callback(&sysConfig)
+				err := cmd.Callback(&sysConfig)
 				if err != nil {
 					fmt.Println("Error:", err)
 				}
 			}
-			// cleanedInput := cleanInput(userInput)
 		}
 	}
 }

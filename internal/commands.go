@@ -125,6 +125,18 @@ func CommandInspect(p *PokedexClient, pokemonName string) error {
 	return nil
 }
 
+func CommandPokedex(p *PokedexClient, pokemonName string) error {
+	if len(p.Pokedex) == 0 {
+		fmt.Println("No pokemon has been added to your pokedex")
+		return nil
+	}
+
+	for key := range p.Pokedex {
+		fmt.Printf("- %s\n", key)
+	}
+	return nil
+}
+
 func GetCommands() map[string]cliCommand {
 	return map[string]cliCommand{
 		"exit": {
@@ -161,6 +173,11 @@ func GetCommands() map[string]cliCommand {
 			name:        "inspect",
 			description: "Gets the info of a pokemon that the user has caught",
 			Callback:    CommandInspect,
+		},
+		"pokedex": {
+			name:        "pokedex",
+			description: "Lists a pokemon has the user has caught",
+			Callback:    CommandPokedex,
 		},
 	}
 }

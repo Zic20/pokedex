@@ -9,16 +9,16 @@ import (
 type cliCommand struct {
 	name        string
 	description string
-	Callback    func(p *PokedexClient) error
+	Callback    func(p *PokedexClient, url string) error
 }
 
-func CommandExit(p *PokedexClient) error {
+func CommandExit(p *PokedexClient, url string) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil // never reached. added to match the callback signature for commands
 }
 
-func CommandHelp(p *PokedexClient) error {
+func CommandHelp(p *PokedexClient, _ string) error {
 	commands := GetCommands()
 	fmt.Println("Welcome to the Pokedex!\nUsage:")
 	for _, command := range commands {
@@ -27,7 +27,7 @@ func CommandHelp(p *PokedexClient) error {
 	return nil
 }
 
-func CommandMap(p *PokedexClient) error {
+func CommandMap(p *PokedexClient, _ string) error {
 	if p.Next == "" {
 		return errors.New("you're on the last page")
 	}
@@ -38,10 +38,12 @@ func CommandMap(p *PokedexClient) error {
 	for _, location := range location_area.Results {
 		fmt.Println(location.Name)
 	}
+	p.Next = location_area.Next
+	p.Previous = location_area.Previous
 	return nil
 }
 
-func CommandMapB(p *PokedexClient) error {
+func CommandMapB(p *PokedexClient, _ string) error {
 	if p.Previous == "" {
 		return errors.New("you're on the first page")
 	}
@@ -52,6 +54,24 @@ func CommandMapB(p *PokedexClient) error {
 	for _, location := range location_area.Results {
 		fmt.Println(location.Name)
 	}
+	p.Next = location_area.Next
+	p.Previous = location_area.Previous
+	return nil
+}
+
+func CommandExplore(p *PokedexClient, url string) error {
+	if url == "" {
+		return errors.New("Explore expects exactly 1 argument")
+	}
+	mapDetails, err := p.ExploreLocation(url)
+	if err != nil {
+		return err
+	}
+
+	for _, encounter := range mapDetails.PokemonEncounters {
+		fmt.Println(encounter.Pokemon.Name)
+	}
+
 	return nil
 }
 
@@ -76,6 +96,11 @@ func GetCommands() map[string]cliCommand {
 			name:        "mapb",
 			description: "Display the names of the previous 20 location areas in the Pokemon world",
 			Callback:    CommandMapB,
+		},
+		"explore": {
+			name:        "explore",
+			description: "Lists all Pokemons located at a location. It takes a city argument",
+			Callback:    CommandExplore,
 		},
 	}
 }

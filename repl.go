@@ -24,11 +24,22 @@ func runrepl(p *internal.PokedexClient) {
 		fmt.Print("Pokedex > ")
 		if scanner.Scan() {
 			userInput := scanner.Text()
-			cmd, ok := commands[userInput]
+			inputs := CleanInput(userInput)
+			if len(inputs) == 0 {
+				fmt.Println("No input provided")
+				continue
+			}
+			cmd, ok := commands[inputs[0]]
+
 			if !ok {
 				fmt.Println("Unknown command")
 			} else {
-				err := cmd.Callback(p)
+				var err error
+				if len(inputs) > 1 {
+					err = cmd.Callback(p, inputs[1])
+				} else {
+					err = cmd.Callback(p, "")
+				}
 				if err != nil {
 					fmt.Println("Error:", err)
 				}

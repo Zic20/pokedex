@@ -2,8 +2,6 @@ package main
 
 import (
 	"testing"
-
-	"github.com/zic20/pokedex/internal"
 )
 
 func TestCleanInput(t *testing.T) {
@@ -26,7 +24,7 @@ func TestCleanInput(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		actual := internal.CleanInput(c.input)
+		actual := CleanInput(c.input)
 		for i := range actual {
 			word := actual[i]
 			expectedWord := c.expected[i]

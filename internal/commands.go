@@ -99,6 +99,32 @@ func CommandCatch(p *PokedexClient, url string) error {
 	return nil
 }
 
+func CommandInspect(p *PokedexClient, pokemonName string) error {
+	if pokemonName == "" {
+		return errors.New("Inspect expects exactly 1 argument")
+	}
+
+	pokemonInfo, ok := p.Pokedex[pokemonName]
+	if !ok {
+		fmt.Printf("you have not caught %s\n", pokemonName)
+		return nil
+	}
+
+	fmt.Printf("Name: %s\n", pokemonInfo.Name)
+	fmt.Printf("Height: %d\n", pokemonInfo.Height)
+	fmt.Printf("Weight: %d\n", pokemonInfo.Weight)
+	fmt.Println("Stats:")
+	for _, stat := range pokemonInfo.Stats {
+		fmt.Printf("-%s: %d\n", stat.Stat.Name, stat.BaseStat)
+	}
+	fmt.Println("Types:")
+	for _, c := range pokemonInfo.Types {
+		fmt.Printf("- %s\n", c.Type.Name)
+	}
+
+	return nil
+}
+
 func GetCommands() map[string]cliCommand {
 	return map[string]cliCommand{
 		"exit": {
@@ -130,6 +156,11 @@ func GetCommands() map[string]cliCommand {
 			name:        "catch",
 			description: "Tries to the the Pokemon specified by the user",
 			Callback:    CommandCatch,
+		},
+		"inspect": {
+			name:        "inspect",
+			description: "Gets the info of a pokemon that the user has caught",
+			Callback:    CommandInspect,
 		},
 	}
 }

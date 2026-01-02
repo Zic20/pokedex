@@ -73,6 +73,17 @@ type exploreRespone struct {
 type Pokemon struct {
 	Name           string `json:"name"`
 	BaseExperience int    `json:"base_experience"`
+	Height         int    `json:"height"`
+	Weight         int    `json:"weight"`
+	Stats          []struct {
+		BaseStat int     `json:"base_stat"`
+		Effort   int     `json:"effort"`
+		Stat     nameUrl `json:"stat"`
+	} `json:"stats"`
+	Types []struct {
+		Slot int     `json:"slot"`
+		Type nameUrl `json:"type"`
+	} `json:"types"`
 }
 
 func NewPokedex(timeout, cacheInterval time.Duration) PokedexClient {

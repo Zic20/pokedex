@@ -3,6 +3,7 @@ package internal
 import (
 	"errors"
 	"fmt"
+	"math/rand"
 	"os"
 )
 
@@ -75,6 +76,29 @@ func CommandExplore(p *PokedexClient, url string) error {
 	return nil
 }
 
+func CommandCatch(p *PokedexClient, url string) error {
+	if url == "" {
+		return errors.New("Catch expects exactly 1 argument")
+	}
+
+	fullUrl := "https://pokeapi.co/api/v2/pokemon/" + url
+	fmt.Printf("Throwing a Pokeball at %s...\n", url)
+	pokemonInfo, err := p.FetchPokemonInfo(fullUrl)
+	if err != nil {
+		return err
+	}
+
+	chances := rand.Intn(pokemonInfo.BaseExperience + 20)
+	fmt.Println(chances, pokemonInfo.BaseExperience)
+	if chances >= pokemonInfo.BaseExperience {
+		fmt.Printf("%s was caught\n", url)
+		p.Pokedex[url] = pokemonInfo
+	} else {
+		fmt.Printf("%s escaped!\n", url)
+	}
+	return nil
+}
+
 func GetCommands() map[string]cliCommand {
 	return map[string]cliCommand{
 		"exit": {
@@ -94,13 +118,18 @@ func GetCommands() map[string]cliCommand {
 		},
 		"mapb": {
 			name:        "mapb",
-			description: "Display the names of the previous 20 location areas in the Pokemon world",
+			description: "Displays the names of the previous 20 location areas in the Pokemon world",
 			Callback:    CommandMapB,
 		},
 		"explore": {
 			name:        "explore",
 			description: "Lists all Pokemons located at a location. It takes a city argument",
 			Callback:    CommandExplore,
+		},
+		"catch": {
+			name:        "catch",
+			description: "Tries to the the Pokemon specified by the user",
+			Callback:    CommandCatch,
 		},
 	}
 }

@@ -15,6 +15,7 @@ type PokedexClient struct {
 	httpClient http.Client
 	Next       string
 	Previous   string
+	Pokedex    map[string]Pokemon
 }
 
 type locationResponse struct {
@@ -69,6 +70,11 @@ type exploreRespone struct {
 	} `json:"pokemon_encounters"`
 }
 
+type Pokemon struct {
+	Name           string `json:"name"`
+	BaseExperience int    `json:"base_experience"`
+}
+
 func NewPokedex(timeout, cacheInterval time.Duration) PokedexClient {
 	return PokedexClient{
 		cache: pokecache.NewCache(cacheInterval),
@@ -77,6 +83,7 @@ func NewPokedex(timeout, cacheInterval time.Duration) PokedexClient {
 		},
 		Next:     BaseUrl,
 		Previous: "",
+		Pokedex:  make(map[string]Pokemon),
 	}
 }
 
@@ -137,4 +144,32 @@ func (p *PokedexClient) ExploreLocation(url string) (exploreRespone, error) {
 
 	p.cache.Add(fullUrl, data)
 	return result, nil
+}
+
+func (p *PokedexClient) FetchPokemonInfo(url string) (Pokemon, error) {
+	var result Pokemon
+
+	data, ok := p.cache.Get(url)
+	if ok {
+		if err := json.Unmarshal(data, &result); err != nil {
+			return result, err
+		}
+
+		return result, nil
+	}
+
+	res, err := p.httpClient.Get(url)
+	if err != nil {
+		return result, fmt.Errorf("Error fetching Pokemon data: %s", err)
+	}
+	data, err = io.ReadAll(res.Body)
+	if err != nil {
+		return result, fmt.Errorf("Error reading response body: %s", err)
+	}
+	if err := json.Unmarshal(data, &result); err != nil {
+		return result, err
+	}
+
+	return result, nil
+
 }
